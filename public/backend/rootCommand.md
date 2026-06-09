@@ -21,7 +21,7 @@ This file documents the status of the Nexus project setup and the commands to ma
 ### 1. Infrastructure
 Start all services (Postgres, Redis, Backend, Frontend):
 ```bash
-docker-compose -f infra/docker-compose.yml up -d
+docker-compose -f backend/infra/docker-compose.yml up -d
 ```
 
 ### 2. Database Migrations
@@ -64,7 +64,9 @@ nexus/
 │   │   ├── server/            # Main API entry
 │   │   └── migrate/           # DB Migration runner
 │   ├── internal/              # Core logic (auth, marketplace, etc.)
-│   └── pkg/                   # Shared packages
-├── infra/                     # Docker & Traefik config
-└── rootCommand.md             # Project roadmap & commands
+│   ├── pkg/                   # Shared packages
+│   └── infra/                 # Docker & Traefik config
+├── public/
+│   └── backend/               # Public assets & setup docs
+└── README.md                  # Main entry point
 ```
