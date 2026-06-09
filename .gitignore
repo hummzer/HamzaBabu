@@ -1,4 +1,4 @@
-# Logs
+# --- LOGS ---
 logs
 *.log
 npm-debug.log*
@@ -7,42 +7,101 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependency directories
+# --- DEPENDENCIES ---
 node_modules/
+/frontend/node_modules/
+/backend/vendor/
+.pnp
+.pnp.js
+
+# --- BUILD & DIST ---
 dist/
 dist-ssr/
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea/
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# OS metadata
-.DS_Store
-Thumbs.db
-
-# Build results
+build/
+bin/
 /frontend/dist/
 /backend/main
 /backend/cmd/server/main
 /backend/cmd/migrate/main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
-# Infrastructure
-/backend/infra/postgres/data/
-
-# Environments
+# --- ENVIRONMENTS & SECRETS ---
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+*.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.pem
+*.key
+*.pub
+/ssh/
+secrets.yaml
+vault/
 
-# Typescript
+# --- IDEs & EDITORS ---
+# Zed
+.zed/
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+# Vim / Neovim
+*.swp
+*.swo
+*~
+.netrwhist
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+# IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# --- CLI TOOLS & LOCAL CONFIGS ---
+# Gemini CLI
+.gemini/
+.nexus/
+memory/
+MEMORY.md
+# Codex / Other CLIs
+.codex/
+.config/
+.local/
+.cache/
+.bash_history
+.zsh_history
+
+# --- OS METADATA ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# --- INFRASTRUCTURE DATA ---
+/backend/infra/postgres/data/
+/backend/infra/redis/data/
+*.db
+*.sqlite
+
+# --- TYPESCRIPT ---
 *.tsbuildinfo
