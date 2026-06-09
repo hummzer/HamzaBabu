@@ -2,12 +2,15 @@ package auth
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/salimhamza/nexus/internal/config"
+	"github.com/salimhamza/nexus/internal/models"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -15,13 +18,15 @@ import (
 type AuthHandler struct {
 	config     config.Config
 	tokenMaker Maker
+	userStore  models.UserStore
 	oauthConf  *oauth2.Config
 }
 
-func NewAuthHandler(config config.Config, tokenMaker Maker) *AuthHandler {
+func NewAuthHandler(config config.Config, tokenMaker Maker, userStore models.UserStore) *AuthHandler {
 	return &AuthHandler{
 		config:     config,
 		tokenMaker: tokenMaker,
+		userStore:  userStore,
 		oauthConf: &oauth2.Config{
 			ClientID:     config.GitHubClientID,
 			ClientSecret: config.GitHubClientSecret,
@@ -60,24 +65,48 @@ func (h *AuthHandler) GitHubCallback(ctx *gin.Context) {
 	}
 	defer resp.Body.Close()
 
-	var user struct {
-		ID    int    `json:"id"`
+	var githubUser struct {
+		ID    int64  `json:"id"`
 		Login string `json:"login"`
 		Email string `json:"email"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&githubUser); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode user info"})
 		return
 	}
 
-	// Here we would typically save the user to the database if they don't exist
-	// and then generate our own JWT/PASETO token for them.
-	
-	fmt.Printf("User logged in: %s (%s)\n", user.Login, user.Email)
+	// 1. Check if user exists by GitHub ID
+	user, err := h.userStore.GetUserByGitHubID(ctx, githubUser.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// 2. Create new user if not found
+			newID, _ := uuid.NewRandom()
+			user = &models.User{
+				ID:       newID,
+				Email:    githubUser.Email,
+				GitHubID: githubUser.ID,
+			}
+			err = h.userStore.CreateUser(ctx, user)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+				return
+			}
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+			return
+		}
+	}
+
+	// 3. Generate our own access token
+	accessToken, _, err := h.tokenMaker.CreateToken(user.ID, h.config.AccessTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create access token"})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Successfully logged in with GitHub",
-		"user":    user,
+		"access_token": accessToken,
+		"user":         user,
 	})
 }

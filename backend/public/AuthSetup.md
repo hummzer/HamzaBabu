@@ -14,6 +14,7 @@ go get golang.org/x/crypto/bcrypt
 go get github.com/aidarkhanov/paseto
 go get golang.org/x/oauth2
 go get github.com/spf13/viper
+go get github.com/lib/pq
 go mod tidy
 ```
 
