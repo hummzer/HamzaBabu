@@ -13,6 +13,7 @@ go get github.com/gin-gonic/gin
 go get golang.org/x/crypto/bcrypt
 go get github.com/aidarkhanov/paseto
 go get golang.org/x/oauth2
+go get github.com/spf13/viper
 go mod tidy
 ```
 
@@ -22,8 +23,11 @@ I have created the following files in `feat/auth-system-implementation` branch:
 - `internal/auth/maker.go`: Token maker interface and payload.
 - `internal/auth/errors.go`: Auth errors.
 - `internal/auth/jwt_maker.go`: JWT implementation.
+- `internal/auth/paseto_maker.go`: PASETO implementation.
+- `internal/middleware/auth.go`: Gin auth middleware.
+- `internal/config/config.go`: Configuration loader (Viper).
+- `internal/auth/handler.go`: GitHub OAuth handler.
 
 ### 3. Next Steps in Development
-- **PASETO Implementation**: I will add PASETO support next.
-- **Auth Middleware**: I will create middleware to protect routes.
-- **GitHub OAuth**: I will scaffold the OAuth flow once you provide the credentials.
+- **Database Integration**: Save GitHub users to Postgres.
+- **Frontend Integration**: Build the login button and handle tokens in React.

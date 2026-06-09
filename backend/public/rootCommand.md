@@ -19,9 +19,9 @@ This file documents the status of the Nexus project setup and the commands to ma
 ## Commands Reference
 
 ### 1. Infrastructure
-Start all services (Postgres, Redis, Backend, Frontend):
+Start all services (Postgres, Redis, Backend, Frontend) using the backend environment file:
 ```bash
-docker-compose -f backend/infra/docker-compose.yml up -d
+docker-compose --env-file backend/.env -f backend/infra/docker-compose.yml up -d
 ```
 
 ### 2. Database Migrations
