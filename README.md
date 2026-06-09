@@ -9,10 +9,10 @@ Nexus is a full-stack platform serving as a professional headquarters, featuring
 
 ## Documentation
 
-Resources and setup instructions can be found in the `public/backend` directory:
-- [Root Commands](./public/backend/rootCommand.md)
-- [Environment Example](./public/backend/.env.example)
+Resources and setup instructions can be found in the `backend/public` directory:
+- [Root Commands](./backend/public/rootCommand.md)
+- [Environment Example](./backend/public/.env.example)
 
 ## Getting Started
 
-Refer to the [Root Commands](./public/backend/rootCommand.md) for detailed setup and development instructions.
+Refer to the [Root Commands](./backend/public/rootCommand.md) for detailed setup and development instructions.

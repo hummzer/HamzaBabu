@@ -1,0 +1,21 @@
+# Nexus - Portfolio & Software Marketplace
+
+Nexus is a full-stack platform serving as the professional headquarters for Salim Hamza.
+
+## Key Modules
+
+- Portfolio: About, Skills, Projects, Certifications.
+- Marketplace: Selling EAs, indicators, scripts, and AI tools.
+- Licensing: Automated license key generation and validation.
+- Documentation: Auto-generated product documentation and changelogs.
+
+## Tech Stack
+
+- Frontend: React, TypeScript, Vite, Tailwind CSS.
+- Backend: Go (Gin), PostgreSQL, Redis.
+- Infrastructure: Docker, Traefik.
+
+## Architecture
+
+The project is structured as a monorepo with separate `frontend` and `backend` services.
+The `backend/public` directory contains setup documentation and administrative assets.

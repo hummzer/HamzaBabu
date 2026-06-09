@@ -65,8 +65,7 @@ nexus/
 │   │   └── migrate/           # DB Migration runner
 │   ├── internal/              # Core logic (auth, marketplace, etc.)
 │   ├── pkg/                   # Shared packages
-│   └── infra/                 # Docker & Traefik config
-├── public/
-│   └── backend/               # Public assets & setup docs
+│   ├── infra/                 # Docker & Traefik config
+│   └── public/                # Public assets & setup docs
 └── README.md                  # Main entry point
 ```

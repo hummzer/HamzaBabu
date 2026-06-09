@@ -12,4 +12,4 @@ The backend for Nexus, built with Go and Gin.
 
 ## Development
 
-Refer to the root [README.md](../README.md) and [Root Commands](../public/backend/rootCommand.md) for setup instructions.
+Refer to the root [README.md](../README.md) and [Root Commands](./public/rootCommand.md) for setup instructions.
