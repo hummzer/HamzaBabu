@@ -105,8 +105,8 @@ func (h *AuthHandler) GitHubCallback(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"access_token": accessToken,
-		"user":         user,
-	})
+	// 4. Redirect to frontend with token
+	target := fmt.Sprintf("http://localhost:5173/auth/callback?token=%s&id=%s&email=%s", 
+		accessToken, user.ID.String(), user.Email)
+	ctx.Redirect(http.StatusPermanentRedirect, target)
 }
