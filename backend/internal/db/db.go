@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	_ "github.com/lib/pq"
-	"github.com/salimhamza/nexus/internal/config"
+	"github.com/hummzer/HamzaBabu/internal/config"
 )
 
 // NewConnection creates a new database connection

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/salimhamza/nexus/internal/models"
+	"github.com/hummzer/HamzaBabu/internal/models"
 )
 
 type SQLUserStore struct {

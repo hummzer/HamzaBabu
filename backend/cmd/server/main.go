@@ -4,9 +4,9 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/salimhamza/nexus/internal/auth"
-	"github.com/salimhamza/nexus/internal/config"
-	"github.com/salimhamza/nexus/internal/db"
+	"github.com/hummzer/HamzaBabu/internal/auth"
+	"github.com/hummzer/HamzaBabu/internal/config"
+	"github.com/hummzer/HamzaBabu/internal/db"
 )
 
 func main() {

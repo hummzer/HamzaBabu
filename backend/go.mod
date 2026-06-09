@@ -1,4 +1,4 @@
-module github.com/salimhamza/nexus
+module github.com/hummzer/HamzaBabu
 
 go 1.25.0
 

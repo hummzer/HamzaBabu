@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/salimhamza/nexus/internal/config"
-	"github.com/salimhamza/nexus/internal/models"
+	"github.com/hummzer/HamzaBabu/internal/config"
+	"github.com/hummzer/HamzaBabu/internal/models"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
