@@ -54,7 +54,8 @@ func (h *AuthHandler) GitHubCallback(ctx *gin.Context) {
 
 	token, err := h.oauthConf.Exchange(context.Background(), code)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token"})
+		fmt.Printf("OAuth Exchange Error: %v\n", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token", "details": err.Error()})
 		return
 	}
 
@@ -109,5 +110,5 @@ func (h *AuthHandler) GitHubCallback(ctx *gin.Context) {
 	// 4. Redirect to frontend with token
 	target := fmt.Sprintf("http://localhost:5173/auth/callback?token=%s&id=%s&email=%s", 
 		accessToken, user.ID.String(), user.Email)
-	ctx.Redirect(http.StatusPermanentRedirect, target)
+	ctx.Redirect(http.StatusTemporaryRedirect, target)
 }

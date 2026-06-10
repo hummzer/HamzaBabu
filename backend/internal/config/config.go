@@ -33,9 +33,16 @@ func LoadConfig(path string) (config Config, err error) {
 
 	viper.AutomaticEnv()
 
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
+	// Handle case where config file is missing
+	if err = viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return
+		}
+	}
+
+	// This allows Viper to unmarshal environment variables even if no config file is loaded
+	for _, field := range []string{"DB_USER", "DB_PASSWORD", "DB_NAME", "DB_HOST", "DB_PORT", "REDIS_HOST", "REDIS_PORT", "JWT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", "STRIPE_API_KEY", "STRIPE_WEBHOOK_SECRET"} {
+		viper.BindEnv(field)
 	}
 
 	err = viper.Unmarshal(&config)

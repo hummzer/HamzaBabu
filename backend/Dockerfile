@@ -9,6 +9,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/server/main.go
 
 # Run stage
 FROM alpine:latest
+RUN apk add --no-cache ca-certificates
 WORKDIR /root/
 COPY --from=builder /app/main .
 EXPOSE 8080
