@@ -1,5 +1,5 @@
 import React from 'react';
-import { Github } from 'lucide-react';
+import { FaGithub } from 'react-icons/fa'
 
 const LoginPage: React.FC = () => {
   const handleGitHubLogin = () => {
@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
             className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
           >
             <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-              <Github className="h-5 w-5 text-gray-400 group-hover:text-gray-300" aria-hidden="true" />
+              <FaGithub className="h-5 w-5 text-gray-400 group-hover:text-gray-300" aria-hidden="true" />
             </span>
             Sign in with GitHub
           </button>
