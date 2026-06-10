@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, ExternalLink, Mail, MapPin } from 'lucide-react';
+import { Download, Mail, MapPin } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 
 const AboutPage: React.FC = () => {
