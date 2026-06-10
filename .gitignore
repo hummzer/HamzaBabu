@@ -75,7 +75,9 @@ vault/
 *.ipr
 
 # --- CLI TOOLS & LOCAL CONFIGS ---
-# Gemini CLI
+# Gemini CLI / Agent skills
+.agents/
+.qwen/
 .gemini/
 .nexus/
 memory/
