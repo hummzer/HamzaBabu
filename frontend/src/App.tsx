@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/auth/LoginPage';
 import AuthCallback from './pages/auth/AuthCallback';
+import LandingPage from './pages/marketing/LandingPage';
+import AboutPage from './pages/marketing/AboutPage';
+import ProjectsPage from './pages/marketing/ProjectsPage';
 import './App.css';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -48,6 +51,9 @@ const Dashboard = () => {
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/projects" element={<ProjectsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route 
@@ -58,7 +64,6 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
-      <Route path="/" element={<Navigate to="/dashboard" />} />
     </Routes>
   );
 }
