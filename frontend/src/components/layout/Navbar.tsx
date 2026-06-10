@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Github, LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon } from 'lucide-react';
+import { FaGithub } from 'react-icons/fa';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -40,7 +41,7 @@ const Navbar: React.FC = () => {
                 to="/login"
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 transition-colors"
               >
-                <GitHub className="h-4 w-4 mr-2" />
+                <FaGithub className="h-4 w-4 mr-2" />
                 Sign In
               </Link>
             )}
