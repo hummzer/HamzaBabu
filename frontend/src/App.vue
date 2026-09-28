@@ -29,7 +29,7 @@ const servicePackages = [
   {title:'EA / QUANT SYSTEMS',cat:'PACKAGE · QUANT ENGINEERING',desc:'Custom EA and quantitative-system engineering for XAUUSD research, multi-strategy execution, historical backtesting, risk controls and strategy portfolios.',price:'CUSTOM QUOTE',steps:'Strategy selection → data test → optimisation → risk → delivery',subject:'EA / Quant Systems Package'},
   {title:'COMPLETE SECURITY INSTALLATION',cat:'PACKAGE · RESIDENTIAL SECURITY',desc:'End-to-end design, networking, HAOS/Proxmox build, CCTV integration, detection, access automation, remote access, dashboards and commissioning. Pricing is custom to property size, hardware count, network complexity and automation scope.',price:'CUSTOM QUOTE',steps:'Site survey → architecture → installation → automation → handover',subject:'Home Security Installation Enquiry'}
 ]
-const archive = computed(() => projects.filter(p=>!p.featured))
+const archive = computed(() => projects.filter(p=>!p.featured && !['Python for Security','STRIX','GoldViper','MQL5 Systems'].includes(p.title)))
 const skills = [
   ['FRONTEND','Vue.js','React','Next.js','TypeScript','JavaScript','HTML/CSS'],
   ['BACKEND','Laravel','PHP','Node.js','REST APIs','MySQL','PostgreSQL','Prisma'],
@@ -47,29 +47,44 @@ const quantEas = [
   {slug:'super-gold-v2',title:'Super Gold V2.0',market:'XAUUSD',platform:'MT4 / EA',mode:'Gold strategy',timeframes:'Intraday',artifact:'EA archive',stats:['Super Gold V2.0','MT4 EA artifact','Preset/config package'],preview:'// Super Gold V2.0 EA\\n// implementation retained as compiled/private artifact\\n// source available by enquiry',tags:['XAUUSD','SUPERGOLD','MT4','PRIVATE']},
   {slug:'gold-reaper',title:'The Gold Reaper V1.5',market:'XAUUSD',platform:'MT4 / EA',mode:'Gold scalping',timeframes:'Intraday',artifact:'EA archive',stats:['Gold Reaper V1.5','MT4 EA artifact','Gold-focused package'],preview:'// The Gold Reaper V1.5\\n// proprietary execution logic withheld\\n// public technical preview only',tags:['XAUUSD','REAPER','MT4','PRIVATE']}
 ]
-const quantIndicators = [
-  ['VP-v6','Volume / profile toolkit','MQL5 archive · package'],
-  ['FiboRetracement','Fibonacci retracement tooling','MQL5 archive · indicator package'],
-  ['Smart Money Concepts','SMC-oriented chart tooling','MQL5 archive · indicator package'],
-  ['SupportResistance','Support / resistance tooling','MQL5 archive · indicator package'],
-  ['FXSSI Trading Sessions','Trading-session visualization','MQL5 archive · indicator package'],
-  ['KT Risk Reward','Risk/reward chart tooling','MQL5 archive · indicator package'],
-  ['AutoTrendLines','Automatic trendline tooling','MQL5 archive · indicator package'],
-  ['Candlestick Pattern Detector','Candlestick pattern detection','MQL5 archive · indicator package']
+const quantExecutables = [
+  {slug:'gold-scalper-trading',title:'Gold Scalper Trading',platform:'MT4 / EX4'},
+  {slug:'dark-gold-ea',title:'Dark Gold EA',platform:'MT4 / SET'},
+  {slug:'ft-gold-robot',title:'FT Gold Robot v5.4',platform:'MT4 / PACKAGE'},
+  {slug:'gold-hunter-v9',title:'GOLD HUNTER V9 MT5 EA',platform:'MT5 / EA'},
+  {slug:'goldminer-ai',title:'Goldminer AI MT4',platform:'MT4 / PACKAGE'},
+  {slug:'orion-gold-scalper',title:'ORION GOLD SCALPER V4.0',platform:'MT4 / PACKAGE'},
+  {slug:'super-gold-v2',title:'Super Gold V2.0',platform:'MT4 / EA'},
+  {slug:'gold-reaper',title:'The Gold Reaper V1.5',platform:'MT4 / EA'}
 ]
+const customQuant = [
+  ['Opening Range Breakout','Tracks a designated London or New York opening range. A confirmed close beyond the range triggers directional entry.','15/30m window · breakout close','SL opposite extreme or midpoint'],
+  ['Supply & Demand Zone Rejection','Detects base zones before sharp momentum extensions and seeks confirmed pullbacks into unmitigated zones.','Zone detection · confirmation candle','Zone invalidation / structural target'],
+  ['Moving Average Cross + Trend Filter','Fast EMA crosses the slow EMA while a macro condition such as 200 SMA slope or ADX validates direction.','EMA 9/20 vs 50/200 · ADX option','Trend-filtered crossover'],
+  ['Bollinger Band Mean Reversion','Fades closes outside the outer Bollinger Band when RSI or Stochastic confirms an overextended state.','BB(20,2) · RSI/Stoch filter','Return toward SMA20'],
+  ['Donchian Channel Breakout','Turtle-style breakout using the highest high and lowest low over a rolling N-bar channel.','20-bar default','Opposite shorter channel / exit rule'],
+  ['MACD Zero-Line Momentum','Requires a MACD zero-line crossover plus increasing histogram momentum for at least two bars.','MACD · histogram acceleration','Momentum invalidation / structural exit'],
+  ['Fibonacci Retracement Pullback','Maps a recent swing high-low and looks for reversal inside the 61.8–78.6% retracement area.','61.8/78.6% zone','Prior structural extreme'],
+  ['SuperTrend MTF Trend Following','ATR-backed SuperTrend flips only on confirmed closes, with higher-timeframe trend context available.','ATR SuperTrend · MTF','Dynamic SuperTrend stop'],
+  ['VWAP Session Reversion','Uses session VWAP and standard-deviation bands to fade extreme deviations back toward fair value.','VWAP · ±1/±2σ','VWAP mean reversion'],
+  ['BOS & ChoCH Structure Engine','Tracks confirmed swing pivots. Minor breaks classify continuation while major counter-trend breaks flag structural reversal.','Swing pivots · BOS · ChoCH','Structural invalidation / liquidity'],
+  ['RSI Divergence Reversal','Identifies price higher-high / RSI lower-high or inverse divergence, then waits for a countertrend swing break.','RSI divergence · swing break','Countertrend structure'],
+  ['ATR Breakout Volatility Expansion','Detects compressed ranges relative to rolling ATR and places conditional breakout orders beyond the compression bar.','ATR compression threshold','Opposite side / volatility stop']
+].map((x,i)=>({id:i+1,name:x[0],description:x[1],logic:x[2],exit:x[3],source:'// '+x[0]+'\\n// strategy architecture + execution layer\\n// partial source window; full custom implementation available by request.'}))
+const quantIndicators = [
+  ['VP-v6','Volume / profile toolkit'],['FiboRetracement','Fibonacci retracement tooling'],['Smart Money Concepts','SMC-oriented chart tooling'],['SupportResistance','Support / resistance tooling'],['FXSSI Trading Sessions','Trading-session visualization'],['KT Risk Reward','Risk/reward chart tooling'],['AutoTrendLines','Automatic trendline tooling'],['Candlestick Pattern Detector','Candlestick pattern detection']
+]
+const quantFilter = ref('executables')
+const customOpen = ref(null)
+const toggleCustom = (id) => { customOpen.value = customOpen.value === id ? null : id }
+const checkoutItem = ref(null)
+const openCheckout = (name) => { checkoutItem.value = name }
+const closeCheckout = () => { checkoutItem.value = null }
 const isDetail = computed(() => route.value.startsWith('/quant/'))
-const activeQuant = computed(() => quantEas.find(x => '/quant/'+x.slug === route.value))
-const openQuant = (slug:string) => {
-  history.pushState({}, '', '/quant/' + slug)
-  route.value = window.location.pathname
-  window.scrollTo({top:0,behavior:'smooth'})
-}
-const syncRoute = () => { route.value = window.location.pathname }
-const closeQuant = () => {
-  history.pushState({}, '', '/')
-  route.value = '/'
-  window.scrollTo({top:0,behavior:'smooth'})
-}
+const activeQuant = computed(() => quantExecutables.find(x => '/quant/'+x.slug === route.value))
+const openQuant = (slug) => { history.pushState({}, '', '/quant/'+slug); route.value=window.location.pathname; window.scrollTo({top:0,behavior:'smooth'}) }
+const syncRoute = () => { route.value=window.location.pathname }
+const closeQuant = () => { history.pushState({}, '', '/'); route.value='/'; window.scrollTo({top:0,behavior:'smooth'}) }
 const youtube = [
   ['WALES','Channel automation / media workflow','Automated collection and processing around a channel workflow.'],
   ['Shorts Creation','Short-form production pipeline','Python + FFmpeg-oriented workflow for assembling and preparing short-form videos.'],
