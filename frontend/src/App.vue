@@ -64,6 +64,7 @@ const openQuant = (slug:string) => {
   route.value = window.location.pathname
   window.scrollTo({top:0,behavior:'smooth'})
 }
+const syncRoute = () => { route.value = window.location.pathname }
 const closeQuant = () => {
   history.pushState({}, '', '/')
   route.value = '/'
@@ -181,7 +182,7 @@ function scrollSpy(){
 }
 onMounted(()=>{
   addEventListener('scroll',scrollSpy,{passive:true})
-  addEventListener('popstate',()=>{ route.value = window.location.pathname })
+  addEventListener('popstate',syncRoute)
   revealObserver.value = new IntersectionObserver((entries)=>{
     entries.forEach((entry)=>{
       if(entry.isIntersecting) entry.target.classList.add('is-visible')
@@ -193,7 +194,7 @@ onMounted(()=>{
 onBeforeUnmount(()=>{
   removeEventListener('scroll',scrollSpy)
   revealObserver.value?.disconnect()
-  removeEventListener('popstate',()=>{ route.value = window.location.pathname })
+  removeEventListener('popstate',syncRoute)
 })
 </script>
 <template>
@@ -209,7 +210,7 @@ onBeforeUnmount(()=>{
 
     <section id="experience" class="pad dark"><small>04 — CURRENTLY</small><div class="split"><div><label>CURRENT ROLE</label><h2>Building at <em>33 Solutions.</em></h2><p>Startup product engineering, application development, implementation, debugging and delivery. The role sits close to real product decisions rather than isolated coding tasks.</p><span class="chip">● CURRENT · 2026</span></div><div class="timeline"><b>33 SOLUTIONS</b><p>Full-stack Web Developer · product engineering · application development</p><b>SECURITY PRACTICE</b><p>Red teaming, Linux, Python security tooling, web security research and offensive-security labs.</p><b>OPEN SOURCE EXPLORER</b><p>Building systems, studying tooling and documenting what can be made public.</p></div></div></section>
 
-    <section id="quant" class="pad"><div class="section-head"><div><small>05 — QUANT / TRADING SYSTEMS</small><h2>Systems I build for the market.</h2></div><span>PRIVATE SOURCE · COMMERCIAL ACCESS</span></div><div class="quant-intro"><p>Private MetaTrader and TradingView systems around XAUUSD research, mechanical structure and execution logic. Production source is intentionally withheld.</p><div><b>PRIVATE BY DESIGN</b><span>Partial implementation previews only.</span><span>Source available by private commercial enquiry.</span></div></div><div class="quant-scroller">
+    <section id="quant" class="pad"><div class="section-head"><div><small>05 — EA / QUANT SYSTEMS</small><h2>EA systems I build for the market.</h2></div><span>PRIVATE SOURCE · COMMERCIAL ACCESS</span></div><div class="quant-intro"><p>Private MetaTrader and TradingView systems around XAUUSD research, mechanical structure and execution logic. Production source is intentionally withheld.</p><div><b>PRIVATE BY DESIGN</b><span>Partial implementation previews only.</span><span>Source available by private commercial enquiry.</span></div></div><div class="quant-scroller">
   <article v-for="(b,i) in quantEas" :key="b.slug" class="quant-card" @click="openQuant(b.slug)">
     <div class="quant-card-top"><small>0{{i+1}} · {{b.platform}}</small><span>{{b.market}}</span></div>
     <div class="quant-art"><span>EA / {{String(i+1).padStart(2,'0')}}</span><b>{{b.title}}</b></div>
