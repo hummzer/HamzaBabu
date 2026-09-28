@@ -80,6 +80,77 @@ const youtube = [
   ['n8n Publishing / Strategy','Workflow automation','Source-data ingestion, structured content generation and publishing strategy.'],
   ['Children’s Shorts Pipeline','Open-source media generation','Story → images → image-to-video → voice/music → 9:16 MP4 using ComfyUI, Wan 2.1, Flux/SDXL, Piper and FFmpeg.']
 ]
+const youtubeSourcePreview = `def download_video(urls, output_dir="downloads"):
+    os.makedirs(output_dir, exist_ok=True)
+    for url in tqdm(urls, desc="Downloading", unit="video"):
+        cmd = [
+            "yt-dlp", "-f", "best[ext=mp4]",
+            "-o", f"{output_dir}/%(title).40s.%(ext)s", url
+        ]
+        subprocess.run(cmd, stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
+
+def is_video_duration_valid(video_path):
+    clip = mp.VideoFileClip(video_path)
+    return 1800 <= clip.duration <= 3600
+
+def transcribe_audio(video_path):
+    model = whisper.load_model("tiny")
+    audio_path = video_path.replace(".mp4", ".mp3")
+    mp.VideoFileClip(video_path).audio.write_audiofile(
+        audio_path, logger=None
+    )
+    result = model.transcribe(audio_path)
+    return result["segments"]
+
+def create_shorts(video_path, segments, output_dir="shorts", max_count=10):
+    os.makedirs(output_dir, exist_ok=True)
+    video = mp.VideoFileClip(video_path)
+    segment_pool = [
+        seg for seg in segments
+        if seg["end"] - seg["start"] >= 10
+    ]
+    random.shuffle(segment_pool)
+
+    for index, seg in enumerate(segment_pool[:max_count], start=1):
+        start = seg["start"]
+        duration = min(
+            seg["end"] - start,
+            random.randint(30, 60)
+        )
+        clip = video.subclip(start, start + duration).resize(height=720)
+        clip.write_videofile(
+            f"{output_dir}/short_{index}.mp4",
+            codec="libx264",
+            audio_codec="aac",
+            threads=1,
+            logger=None
+        )
+
+def process_videos(links):
+    download_video(links)
+    files = [
+        file for file in os.listdir("downloads")
+        if file.endswith(".mp4")
+    ]
+    for file in files:
+        path = os.path.join("downloads", file)
+        if is_video_duration_valid(path):
+            segments = transcribe_audio(path)
+            create_shorts(path, segments)
+`
+const youtubeArchitecture = [
+  ['01','INPUT','YouTube URL or newline-delimited URL list','youtubelinks.txt / CLI arguments'],
+  ['02','INGEST','yt-dlp downloads source video as MP4','best[ext=mp4] + deterministic output naming'],
+  ['03','GATE','Reject videos outside the 30–60 minute source window','MoviePy duration validation'],
+  ['04','TRANSCRIBE','Extract audio and segment speech','Whisper tiny model'],
+  ['05','SELECT','Build a pool of transcript segments >= 10 seconds','segment filtering + shuffle'],
+  ['06','RENDER','Create 30–60 second vertical-friendly clips','MoviePy + libx264 + AAC'],
+  ['07','APP','Expose the workflow through the web application','Next.js pages + API route'],
+  ['08','PERSIST','Prisma layer and application data model','src/lib/prisma.ts + Prisma schema'],
+  ['09','EXTEND','Additional media/AI pipelines can attach here','FFmpeg / ComfyUI / Piper / n8n']
+]
+
 const systems = [
   ['HAOS / Proxmox','HAOS installed as a Proxmox VM with dual NICs and separated management/camera paths.','Virtualization · Linux · Infrastructure'],
   ['Network segmentation','Four logical security zones cover management, cameras/NVR, IoT/intercom and household traffic.','VLANs · Firewalling · Routing'],
@@ -154,7 +225,14 @@ onBeforeUnmount(()=>{
     <article v-for="(x,i) in quantIndicators" :key="x[0]"><small>IND.0{{i+1}}</small><h3>{{x[0]}}</h3><p>{{x[1]}}</p><span>{{x[2]}}</span></article>
   </div>
 </div>
-<div class="cta-line"><span>EA LICENSING · INDICATORS · CUSTOM DEVELOPMENT · BACKTESTING</span><a href="mailto:zaeh888@gmail.com?subject=EA%20%2F%20Quant%20Systems%20Enquiry">ORDER / REQUEST ACCESS ↗</a></div></section><section id="systems" class="pad dark"><div class="section-head"><div><small>06 — OPEN SOURCE / SYSTEMS ENGINEERING</small><h2>The home-security build is a systems project.</h2></div><span>HAOS · LINUX · NETWORKING · AUTOMATION</span></div><div class="system-hero"><div><label>RESIDENTIAL SECURITY & AUTOMATION</label><h3>From bare infrastructure to a working security control plane.</h3><p>The documented build combines Home Assistant OS, Proxmox, VLAN segmentation, Frigate, Mosquitto, go2rtc, HACS, Tailscale, Reolink, Dahua and Hikvision. It covers gate control, ANPR, facial recognition, PTZ patrols, actionable notifications and a custom Fusion dashboard.</p></div><div class="metrics"><b>22</b><span>Frigate devices</span><b>30</b><span>HA automations</span><b>13+15+20</b><span>PTZ patrol preset flows</span><b>4</b><span>logical network zones</span></div></div><div class="system-grid"><article v-for="x in systems" :key="x[0]"><small>{{x[2]}}</small><h3>{{x[0]}}</h3><p>{{x[1]}}</p></article></div><div class="installation"><div><small>COMPLETE SECURITY INSTALLATION</small><h3>Custom residential security package</h3><p>End-to-end design, networking, HAOS/Proxmox build, CCTV integration, detection, access automation, remote access, dashboards and commissioning. Pricing is custom to property size, hardware count, network complexity and automation scope.</p></div><div><strong>CUSTOM QUOTE</strong><span>Site survey → architecture → installation → automation → handover</span><a href="mailto:zaeh888@gmail.com?subject=Home%20Security%20Installation%20Enquiry">REQUEST A QUOTE ↗</a></div></div><div class="os"><b>OS FLAVORS USED</b><i v-for="x in osFlavors" :key="x">{{x}}</i></div></section><section class="pad"><div class="section-head"><div><small>08 — YOUTUBE / MEDIA AUTOMATION</small><h2>Automation work beyond web apps.</h2></div><span>PYTHON · FFMPEG · N8N · LOCAL AI</span></div><p class="wide">This archive captures the YouTube automation work accumulated across the account: playlist control, Shorts generation, channel tooling, extraction, orchestration and publishing workflows. The progression runs from small CLI utilities to multi-stage media pipelines.</p><div class="media-list"><article v-for="(y,i) in youtube" :key="y[0]"><small>0{{i+1}}</small><div><em>{{y[1]}}</em><h3>{{y[0]}}</h3><p>{{y[2]}}</p></div><b>↗</b></article></div></section>
+<div class="cta-line"><span>EA LICENSING · INDICATORS · CUSTOM DEVELOPMENT · BACKTESTING</span><a href="mailto:zaeh888@gmail.com?subject=EA%20%2F%20Quant%20Systems%20Enquiry">ORDER / REQUEST ACCESS ↗</a></div></section><section id="systems" class="pad dark"><div class="section-head"><div><small>06 — OPEN SOURCE / SYSTEMS ENGINEERING</small><h2>The home-security build is a systems project.</h2></div><span>HAOS · LINUX · NETWORKING · AUTOMATION</span></div><div class="system-hero"><div><label>RESIDENTIAL SECURITY & AUTOMATION</label><h3>From bare infrastructure to a working security control plane.</h3><p>The documented build combines Home Assistant OS, Proxmox, VLAN segmentation, Frigate, Mosquitto, go2rtc, HACS, Tailscale, Reolink, Dahua and Hikvision. It covers gate control, ANPR, facial recognition, PTZ patrols, actionable notifications and a custom Fusion dashboard.</p></div><div class="metrics"><b>22</b><span>Frigate devices</span><b>30</b><span>HA automations</span><b>13+15+20</b><span>PTZ patrol preset flows</span><b>4</b><span>logical network zones</span></div></div><div class="system-grid"><article v-for="x in systems" :key="x[0]"><small>{{x[2]}}</small><h3>{{x[0]}}</h3><p>{{x[1]}}</p></article></div><div class="installation"><div><small>COMPLETE SECURITY INSTALLATION</small><h3>Custom residential security package</h3><p>End-to-end design, networking, HAOS/Proxmox build, CCTV integration, detection, access automation, remote access, dashboards and commissioning. Pricing is custom to property size, hardware count, network complexity and automation scope.</p></div><div><strong>CUSTOM QUOTE</strong><span>Site survey → architecture → installation → automation → handover</span><a href="mailto:zaeh888@gmail.com?subject=Home%20Security%20Installation%20Enquiry">REQUEST A QUOTE ↗</a></div></div><div class="os"><b>OS FLAVORS USED</b><i v-for="x in osFlavors" :key="x">{{x}}</i></div></section><section class="pad"><div class="section-head"><div><small>08 — YOUTUBE / MEDIA AUTOMATION</small><h2>Automation work beyond web apps.</h2></div><span>PYTHON · FFMPEG · N8N · LOCAL AI</span></div><p class="wide">This archive captures the YouTube automation work accumulated across the account: playlist control, Shorts generation, channel tooling, extraction, orchestration and publishing workflows. The progression runs from small CLI utilities to multi-stage media pipelines.</p><div class="media-list"><article v-for="(y,i) in youtube" :key="y[0]"><small>0{{i+1}}</small><div><em>{{y[1]}}</em><h3>{{y[0]}}</h3><p>{{y[2]}}</p></div><b>↗</b></article></div>
+<div class="media-doc">
+  <div class="media-doc-head"><div><small>DOCUMENTATION / SOURCE WINDOW</small><h3>YouTube Shorts Generator — core pipeline</h3></div><a href="https://github.com/hummzer/YoutubeShortsGenerator" target="_blank">OPEN REPOSITORY ↗</a></div>
+  <p>The documented portion follows the real repository flow from URL ingestion through duration gating, Whisper transcription, segment selection and MP4 rendering. The portfolio intentionally publishes only a source window rather than the complete project.</p>
+  <div class="media-architecture"><article v-for="x in youtubeArchitecture" :key="x[0]"><small>{{x[0]}} · {{x[1]}}</small><h4>{{x[2]}}</h4><span>{{x[3]}}</span></article></div>
+  <div class="code media-code"><div>PYTHON / src/python_scripts/wales.py / DOCUMENTED SOURCE EXCERPT</div><pre>{{youtubeSourcePreview}}</pre></div>
+  <div class="media-doc-foot"><span>DOCUMENTED SURFACE: CORE INGEST → TRANSCRIBE → CLIP GENERATION + APPLICATION ARCHITECTURE</span><a href="https://github.com/hummzer/YoutubeShortsGenerator/blob/main/src/python_scripts/wales.py" target="_blank">VIEW SOURCE ↗</a></div>
+</div></section>
 
     <section id="skills" class="pad"><div class="section-head"><div><small>09 — SKILLSET</small><h2>Frameworks are only one layer.</h2></div></div><div class="skill-grid"><div v-for="g in skills" :key="g[0]"><small>{{g[0]}}</small><h3>{{g[0]}}</h3><p v-for="s in g.slice(1)" :key="s">{{s}}</p></div></div><div class="shell-note"><span>SHELL / LOCAL SYSTEMS</span><p>Bash scripts · zsh · .bashrc · Oh My Zsh configuration · Python CLI tooling · Linux administration · Git workflows · local AI tooling.</p></div></section>
 
@@ -226,5 +304,9 @@ main > section, .featured article, .archive .row, .quant-grid article, .system-g
 .indicator-scroller{padding-bottom:8px}.indicator-scroller article{flex:0 0 230px;scroll-snap-align:start;border:1px solid #2a2d27;background:#0d0f0d;padding:18px}.indicator-scroller small,.indicator-scroller span{font:500 8px 'DM Mono';color:#666a61}.indicator-scroller h3{font:600 17px Manrope;margin:22px 0 7px}.indicator-scroller p{font-size:10px;color:#7d8178;line-height:1.6;min-height:32px}
 .detail-page{min-height:100vh;background:radial-gradient(circle at 75% 10%,#383326,#10110f 30%,#080908 70%);padding:120px 7vw 80px}.detail-shell{max-width:1200px;margin:auto}.detail-nav{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:70px}.detail-nav span,.detail-kicker,.detail-panel small,.detail-code div{font:500 8px 'DM Mono';letter-spacing:.1em;color:#70746b}.detail-shell h1{font:800 clamp(56px,9vw,120px)/.9 Manrope;letter-spacing:-.08em;max-width:1000px;margin:18px 0 25px}.detail-lede{max-width:760px;color:#8b8f85;line-height:1.9;font-size:14px}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:55px}.detail-panel{border:1px solid #2d302a;background:#0c0e0c;padding:26px}.detail-panel h2{font:600 27px Manrope;margin:22px 0}.detail-panel p{border-top:1px solid #242720;padding:11px 0;margin:0;color:#85897f;font-size:11px}.detail-panel p b{display:inline-block;width:100px;color:#cdbb8e;font:500 8px 'DM Mono'}.detail-panel ul{list-style:none;padding:0;margin:22px 0}.detail-panel li{padding:10px 0;border-top:1px solid #242720;color:#85897f;font-size:11px}.detail-order{border-top:1px solid #242720;padding-top:18px;display:flex;justify-content:space-between;gap:15px;align-items:center}.detail-order strong{font:600 10px 'DM Mono';color:var(--sand)}.detail-order a{font:600 8px 'DM Mono';color:var(--sand)}.detail-code{margin-top:14px;border:1px solid #30332d;background:#080908}.detail-code div{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #292c27}.detail-code div b{color:#b9c98a}.detail-code pre{margin:0;padding:22px;overflow:auto;color:#bdc792;font:500 11px/1.8 'DM Mono';white-space:pre-wrap}.detail-note{margin-top:14px;border-left:2px solid var(--sand);padding:14px 18px;background:#11130f;color:#777b72;font-size:11px;line-height:1.7}
 @media(max-width:720px){.detail-page{padding:95px 18px 60px}.detail-nav{align-items:flex-start;gap:15px;flex-direction:column}.detail-shell h1{font-size:18vw}.detail-grid{grid-template-columns:1fr}.detail-order{align-items:flex-start;flex-direction:column}}
+
+
+.media-doc{margin-top:30px;border:1px solid #30332d;background:#0c0e0c;padding:24px}.media-doc-head{display:flex;justify-content:space-between;align-items:end;gap:20px;border-bottom:1px solid var(--line);padding-bottom:18px}.media-doc-head h3{font:600 28px Manrope;margin:10px 0 0}.media-doc-head a,.media-doc-foot a{font:600 8px 'DM Mono';color:var(--sand)}.media-doc>p{max-width:850px;color:#85897f;font-size:11px;line-height:1.8}.media-architecture{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);margin-top:22px}.media-architecture article{padding:16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:125px}.media-architecture article:nth-child(3n){border-right:0}.media-architecture small,.media-architecture span{font:500 8px 'DM Mono';color:#686c63}.media-architecture h4{font:600 15px Manrope;margin:18px 0 7px}.media-code{margin-top:22px}.media-code pre{max-height:620px}.media-doc-foot{display:flex;justify-content:space-between;gap:15px;border-top:1px solid var(--line);padding-top:15px;margin-top:15px;font:500 8px 'DM Mono';color:#686c63}.media-doc-foot a{white-space:nowrap}
+@media(max-width:720px){.media-doc{padding:16px}.media-doc-head{align-items:flex-start;flex-direction:column}.media-architecture{grid-template-columns:1fr}.media-architecture article{border-right:0}.media-doc-foot{flex-direction:column}}
 
 </style>
